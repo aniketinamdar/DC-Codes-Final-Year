@@ -140,26 +140,40 @@ public:
             }
         }
     }
-    void startElection_ring(node *start_node)
+    void startElection_ring(int total_nodes, node *start_node)
     {
         int ans = INT_MIN;
-        while (!start_node->visited)
+        int num_visited = 0;
+        node *current_node = start_node;
+        while (current_node != nullptr && !current_node->visited)
         {
-            start_node->visited = true;
-            ans = max(ans, start_node->id);
-            node *temp = start_node->next;
-            while (!temp->isAlive)
+            current_node->visited = true;
+            num_visited++;
+            
+            ans = max(ans, current_node->id);
+
+            node *next_node = current_node->next;
+            while (next_node != nullptr && !next_node->isAlive)
             {
-                temp = temp->next;
+                next_node = next_node->next;
             }
-            if (!temp->visited)
+            if (next_node != nullptr && !next_node->visited)
             {
-                cout << start_node->id << " Sent election e" << start_node->id << " to " << temp->id << endl;
+                cout << current_node->id << " Sent election e" << current_node->id << " to " << next_node->id << endl;
             }
-            start_node = temp;
+            current_node = next_node;
         }
-        cout << "New cordinator is " << ans << endl;
+        
+        node *reset_node = start_node;
+        while (reset_node != nullptr)
+        {
+            reset_node->visited = false;
+            reset_node = reset_node->next;
+        }
+
+        cout << "New coordinator is " << ans << endl;
     }
+
 };
 
 int main()
@@ -225,7 +239,7 @@ int main()
             break;
 
         case 5:
-            x.startElection_ring(start_node);
+            x.startElection_ring(num_nodes, start_node);
             break;
 
         default:
